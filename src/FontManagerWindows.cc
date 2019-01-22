@@ -198,9 +198,13 @@ long getAvailableFonts(ResultSet **resultSet) {
 
       CONTINUE_ON_HRESULT_ERROR(family->GetFont(j, &desc));
       CONTINUE_ON_HRESULT_ERROR(resultFromFont(&result, desc));
-      if (psNames.count(result->postscriptName) == 0) {
+      const char* findKey = result->postscriptName;
+      if(strlen(findKey) <= 0) {
+	findKey = result->family;
+      }
+      if (psNames.count(findKey) == 0) {
         (*resultSet)->push_back(result);
-        psNames.insert(result->postscriptName);
+        psNames.insert(findKey);
       } else {
         delete result;
       }
