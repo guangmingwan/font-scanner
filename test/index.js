@@ -4,7 +4,7 @@ var assert = require('assert');
 // some standard fonts that are likely to be installed on the platform the tests are running on
 var standardFont = process.platform === 'linux' ? 'Liberation Sans' : 'Arial';
 var postscriptName = process.platform === 'linux' ? 'LiberationSans' : 'ArialMT';
-
+console.log("standardFont","postscriptName",standardFont,postscriptName)
 describe('font-scanner', function() {
   function assertFontDescriptor(font) {
     assert.notEqual(font, null);

@@ -3,6 +3,7 @@
 #include <uv.h>
 #include <v8.h>
 #include <nan.h>
+#include <new>
 #include "FontDescriptor.h"
 
 using namespace v8;

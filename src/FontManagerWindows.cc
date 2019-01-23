@@ -3,7 +3,9 @@
 #include <dwrite.h>
 /*#include <dwrite_1.h>*/
 #include <unordered_set>
-
+#include <new>
+#define SafeRelease(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
+#define SafeDelete(a) if( (a) != NULL ) delete (a); (a) = NULL;
 // throws a JS error when there is some exception in DirectWrite
 #define HR(hr) \
   if (FAILED(hr)) throw "Font loading error";
@@ -75,7 +77,7 @@ char *getString(IDWriteFont *font, DWRITE_INFORMATIONAL_STRING_ID string_id) {
 
     // convert to utf8
     res = utf16ToUtf8(str);
-    delete str;
+    SafeDelete(str);
 
     strings->Release();
   }
@@ -145,19 +147,19 @@ long resultFromFont(FontDescriptor **res, IDWriteFont *font) {
         monospace
       );
 
-      delete psName;
-      delete name;
-      delete postscriptName;
-      delete family;
-      delete style;
-      fileLoader->Release();
+      SafeDelete(psName);
+      SafeDelete(name);
+      SafeDelete(postscriptName);
+      SafeDelete(family);
+      SafeDelete(style);
+      SafeRelease(fileLoader);
     }
 
-    loader->Release();
+    SafeRelease(loader);
   }
 
-  face->Release();
-  files->Release();
+  SafeRelease(face);
+  SafeRelease(files);
 
   return 0;
 }
@@ -208,19 +210,18 @@ long getAvailableFonts(ResultSet **resultSet) {
           (*resultSet)->push_back(result);
           psNames.insert(findKey);
         } else {
-          if(result) {
-            delete result;
-            result = NULL;
-          }
+          
+          SafeDelete(result);
+          
         }
       }
     }
 
-    family->Release();
+    SafeRelease(family);
   }
 
-  collection->Release();
-  factory->Release();
+  SafeRelease(collection);
+  SafeRelease(factory);
 
   return 0;
 }
@@ -255,10 +256,9 @@ long findFonts(ResultSet** fonts, FontDescriptor *desc) {
 
   for (ResultSet::iterator it = (*fonts)->begin(); it != (*fonts)->end();) {
     if (!resultMatches(*it, desc)) {
-      if(*it) {
-        delete *it;
-        *it = NULL;
-      }
+      
+      SafeDelete(*it);
+      
       it = (*fonts)->erase(it);
     } else {
       it++;
@@ -275,11 +275,9 @@ long findFont(FontDescriptor **foundFont, FontDescriptor *desc) {
 
   // if we didn't find anything, try again with only the font traits, no string names
   if (fonts->size() == 0) {
-    if(fonts) {
-      delete fonts;
-      fonts = NULL;
-    }
-
+    
+    SafeDelete(fonts);
+    
     FontDescriptor *fallback = new FontDescriptor(
       NULL, NULL, NULL, NULL,
       desc->weight, desc->width, desc->italic, false
@@ -291,10 +289,9 @@ long findFont(FontDescriptor **foundFont, FontDescriptor *desc) {
   // ok, nothing. shouldn't happen often.
   // just return the first available font
   if (fonts->size() == 0) {
-    if(fonts) {
-      delete fonts;
-      fonts = NULL;
-    }
+   
+    SafeDelete(fonts);
+     
     RETURN_ERROR_CODE(getAvailableFonts(&fonts));
   }
 
@@ -302,18 +299,16 @@ long findFont(FontDescriptor **foundFont, FontDescriptor *desc) {
   // copy and return the first result
   if (fonts->size() > 0) {
     *foundFont = new FontDescriptor(fonts->front());
-    if(fonts) {
-      delete fonts;
-      fonts = NULL;
-    }
+   
+    SafeDelete(fonts);
+    
     return 0;
   }
 
   // whoa, weird. no fonts installed or something went wrong.
- if(fonts) {
-    delete fonts;
-    fonts = NULL;
-  }
+ 
+    SafeDelete(fonts);
+  
   return 1;
 }
 
@@ -333,10 +328,10 @@ public:
 
   ~FontFallbackRenderer() {
     if (systemFonts)
-      systemFonts->Release();
+      SafeRelease(systemFonts);
 
     if (font)
-      font->Release();
+      SafeRelease(font);
   }
 
   // IDWriteTextRenderer methods
@@ -409,10 +404,9 @@ public:
   IFACEMETHOD_(unsigned long,  Release)() {
     unsigned long newCount = InterlockedDecrement(&refCount);
     if (newCount == 0) {
-      if(this) {
-        delete this;
-        //this = NULL;
-      }
+      
+      delete  this;
+      
       return 0;
     }
 
@@ -470,14 +464,12 @@ long substituteFont(FontDescriptor **res, char *postscriptName, char *string) {
       L"en-us",
       &format
     ));
-    if(familyName) {
-      delete familyName;
-      familyName = NULL;
-    }
-    if(font) {
-      delete font;
-      font = NULL;
-    }
+   
+    SafeDelete(familyName);
+    
+    
+    SafeDelete(font);
+    
   } else {
     // this should never happen, but just in case, let the system
     // decide the default font in case findFont returned nothing.
@@ -517,25 +509,22 @@ long substituteFont(FontDescriptor **res, char *postscriptName, char *string) {
   }
 
   // free all the things
-  if(renderer) {
-    delete renderer;
-    renderer = NULL;
-  }
-  layout->Release();
-  format->Release();
+ 
+  SafeDelete(renderer);
+  
+  SafeRelease(layout);
+  SafeRelease(format);
 
   desc->postscriptName = NULL;
 
-  if(desc) {
-    delete desc;
-    desc = NULL;
-  }
-  if(str) {
-    delete str;
-    str = NULL;
-  }
-  collection->Release();
-  factory->Release();
+  
+  SafeDelete(desc);
+
+
+  SafeDelete(str);
+  
+  SafeRelease(collection);
+  SafeRelease( factory );
 
   return 0;
 }
