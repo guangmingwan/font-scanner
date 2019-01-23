@@ -1,7 +1,7 @@
 #define WINVER 0x0600
 #include "FontDescriptor.h"
 #include <dwrite.h>
-#include <dwrite_1.h>
+/*#include <dwrite_1.h>*/
 #include <unordered_set>
 
 // throws a JS error when there is some exception in DirectWrite
@@ -200,13 +200,15 @@ long getAvailableFonts(ResultSet **resultSet) {
       CONTINUE_ON_HRESULT_ERROR(resultFromFont(&result, desc));
       const char* findKey = result->postscriptName;
       if(strlen(findKey) <= 0) {
-	findKey = result->family;
+        findKey = result->family;
       }
-      if (psNames.count(findKey) == 0) {
-        (*resultSet)->push_back(result);
-        psNames.insert(findKey);
-      } else {
-        delete result;
+      if(strlen(findKey)>0) {
+        if (psNames.count(findKey) == 0) {
+          (*resultSet)->push_back(result);
+          psNames.insert(findKey);
+        } else {
+          delete result;
+        }
       }
     }
 
