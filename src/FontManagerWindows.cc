@@ -411,7 +411,7 @@ public:
     if (newCount == 0) {
       if(this) {
         delete this;
-        this = NULL;
+        //this = NULL;
       }
       return 0;
     }
@@ -476,7 +476,7 @@ long substituteFont(FontDescriptor **res, char *postscriptName, char *string) {
     }
     if(font) {
       delete font;
-      font = NULL:
+      font = NULL;
     }
   } else {
     // this should never happen, but just in case, let the system

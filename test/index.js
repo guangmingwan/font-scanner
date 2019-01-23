@@ -5,8 +5,9 @@ var assert = require('assert');
 var standardFont = process.platform === 'linux' ? 'Liberation Sans' : 'Arial';
 var postscriptName = process.platform === 'linux' ? 'LiberationSans' : 'ArialMT';
 
-describe('font-manager', function() {
+describe('font-scanner', function() {
   function assertFontDescriptor(font) {
+    assert.notEqual(font, null);
     assert.equal(typeof font, 'object');
     assert.equal(typeof font.path, 'string');
     assert.equal(typeof font.postscriptName, 'string');
@@ -439,8 +440,9 @@ describe('font-manager', function() {
     });
 
     it('should substituteFont asynchronously', function() {
-      return fontManager.substituteFont(postscriptName, '汉字')
+      return fontManager.substituteFont(postscriptName, '宋体')
         .then(function(font) {
+          
           assert.equal(typeof font, 'object');
           assert(!Array.isArray(font));
           assertFontDescriptor(font);
