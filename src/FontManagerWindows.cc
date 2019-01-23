@@ -6,6 +6,7 @@
 #include <new>
 #define SafeRelease(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
 #define SafeDelete(a) if( (a) != NULL ) delete (a); (a) = NULL;
+#define SafeDeleteArray(a) if( (a) != NULL ) delete[] (a); (a) = NULL;
 // throws a JS error when there is some exception in DirectWrite
 #define HR(hr) \
   if (FAILED(hr)) throw "Font loading error";
@@ -77,7 +78,7 @@ char *getString(IDWriteFont *font, DWRITE_INFORMATIONAL_STRING_ID string_id) {
 
     // convert to utf8
     res = utf16ToUtf8(str);
-    SafeDelete(str);
+    SafeDeleteArray(str);
 
     strings->Release();
   }
@@ -147,11 +148,11 @@ long resultFromFont(FontDescriptor **res, IDWriteFont *font) {
         monospace
       );
 
-      SafeDelete(psName);
-      SafeDelete(name);
-      SafeDelete(postscriptName);
-      SafeDelete(family);
-      SafeDelete(style);
+      SafeDeleteArray(psName);
+      SafeDeleteArray(name);
+      SafeDeleteArray(postscriptName);
+      SafeDeleteArray(family);
+      SafeDeleteArray(style);
       SafeRelease(fileLoader);
     }
 
@@ -405,7 +406,7 @@ public:
     unsigned long newCount = InterlockedDecrement(&refCount);
     if (newCount == 0) {
       
-      delete  this;
+      delete this;
       
       return 0;
     }
@@ -465,9 +466,7 @@ long substituteFont(FontDescriptor **res, char *postscriptName, char *string) {
       &format
     ));
    
-    SafeDelete(familyName);
-    
-    
+    SafeDeleteArray(familyName);
     SafeDelete(font);
     
   } else {
@@ -519,9 +518,7 @@ long substituteFont(FontDescriptor **res, char *postscriptName, char *string) {
 
   
   SafeDelete(desc);
-
-
-  SafeDelete(str);
+  SafeDeleteArray(str);
   
   SafeRelease(collection);
   SafeRelease( factory );

@@ -78,12 +78,12 @@ struct AsyncRequest {
     }
 
     if (postscriptName) {
-      delete postscriptName;
+      delete []postscriptName;
       postscriptName = NULL;
     }
 
     if (substitutionString) {
-      delete substitutionString;
+      delete []substitutionString;
       substitutionString = NULL;
     }
 

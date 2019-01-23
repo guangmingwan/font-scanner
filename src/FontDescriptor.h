@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
-
+#include <iostream>
+using namespace std;
 using namespace v8;
 
 enum FontWeight {
@@ -92,17 +93,18 @@ public:
   }
   
   ~FontDescriptor() {
+    //cout << "~FontDescriptor()" << endl;
     if (path)
-      delete path;
+      delete []path;
     
     if (postscriptName)
-      delete postscriptName;
+      delete []postscriptName;
     
     if (family)
-      delete family;
+      delete []family;
     
     if (style)
-      delete style;
+      delete []style;
       
     path = NULL;
     postscriptName = NULL;
@@ -171,6 +173,7 @@ private:
 class ResultSet : public std::vector<FontDescriptor *> {
 public:
   ~ResultSet() {
+    //cout << "~ResultSet()" << endl;
     for (ResultSet::iterator it = this->begin(); it != this->end(); it++) {
       delete *it;
     }
