@@ -9,6 +9,9 @@
 #include <iostream>
 using namespace std;
 using namespace v8;
+#define SafeRelease(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
+#define SafeDelete(a) if( (a) != NULL ) delete (a); (a) = NULL;
+#define SafeDeleteArray(a) if( (a) != NULL ) delete[] (a); (a) = NULL;
 
 enum FontWeight {
   FontWeightUndefined   = 0,

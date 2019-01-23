@@ -4,9 +4,7 @@
 /*#include <dwrite_1.h>*/
 #include <unordered_set>
 #include <new>
-#define SafeRelease(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
-#define SafeDelete(a) if( (a) != NULL ) delete (a); (a) = NULL;
-#define SafeDeleteArray(a) if( (a) != NULL ) delete[] (a); (a) = NULL;
+
 // throws a JS error when there is some exception in DirectWrite
 #define HR(hr) \
   if (FAILED(hr)) throw "Font loading error";

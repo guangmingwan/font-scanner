@@ -23,10 +23,7 @@ Local<Array> collectResults(ResultSet *results) {
   for (ResultSet::iterator it = results->begin(); it != results->end(); it++) {
     res->Set(i++, (*it)->toJSObject());
   }
-  if(results) {
-    delete results;
-    results = NULL;
-  }
+  SafeDelete(results)
   return scope.Escape(res);
 }
 
@@ -37,10 +34,7 @@ Local<Value> wrapResult(FontDescriptor *result) {
     return scope.Escape(Nan::Null());
 
   Local<Object> res = result->toJSObject();
-  if(result) {
-    delete result;
-    result = NULL;
-  }
+  SafeDelete(result);
   return scope.Escape(res);
 }
 
@@ -67,25 +61,10 @@ struct AsyncRequest {
   }
 
   ~AsyncRequest() {
-    if(callback) {
-      delete callback;
-      callback = NULL;
-    }
-
-    if (desc) {
-      delete desc;
-      desc = NULL;
-    }
-
-    if (postscriptName) {
-      delete []postscriptName;
-      postscriptName = NULL;
-    }
-
-    if (substitutionString) {
-      delete []substitutionString;
-      substitutionString = NULL;
-    }
+    SafeDelete(callback)
+    SafeDelete(desc)
+    SafeDeleteArray(postscriptName)
+    SafeDeleteArray(substitutionString)
 
     // result/results deleted by wrapResult/collectResults respectively
   }
@@ -109,10 +88,7 @@ void asyncCallback(uv_work_t *work) {
   }
 
   req->callback->Call(2, info, &async);
-  if(req) {
-    delete req;
-    req = NULL;
-  }
+  SafeDelete(req)
 }
 
 void getAvailableFontsAsync(uv_work_t *work) {
@@ -171,10 +147,7 @@ NAN_METHOD(findFonts) {
     }
 
     Local<Object> res = collectResults(results);
-    if(descriptor) {
-      delete descriptor;
-      descriptor = NULL;
-    }
+    SafeDelete(descriptor)
     info.GetReturnValue().Set(res);
   }
 }
@@ -209,10 +182,7 @@ NAN_METHOD(findFont) {
     }
 
     Local<Value> res = wrapResult(result);
-    if(descriptor) {
-      delete descriptor;
-      descriptor = NULL;
-    }
+    SafeDelete(descriptor)
     info.GetReturnValue().Set(res);
   }
 }
@@ -258,6 +228,7 @@ NAN_METHOD(substituteFont) {
     }
 
     info.GetReturnValue().Set(wrapResult(result));
+    
   }
 }
 
