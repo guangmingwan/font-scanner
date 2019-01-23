@@ -103,7 +103,8 @@ public:
     
     if (style)
       delete style;
-    
+      
+    path = NULL;
     postscriptName = NULL;
     family = NULL;
     style = NULL;

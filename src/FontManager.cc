@@ -22,8 +22,10 @@ Local<Array> collectResults(ResultSet *results) {
   for (ResultSet::iterator it = results->begin(); it != results->end(); it++) {
     res->Set(i++, (*it)->toJSObject());
   }
-
-  delete results;
+  if(results) {
+    delete results;
+    results = NULL;
+  }
   return scope.Escape(res);
 }
 
@@ -34,7 +36,10 @@ Local<Value> wrapResult(FontDescriptor *result) {
     return scope.Escape(Nan::Null());
 
   Local<Object> res = result->toJSObject();
-  delete result;
+  if(result) {
+    delete result;
+    result = NULL;
+  }
   return scope.Escape(res);
 }
 
@@ -61,16 +66,25 @@ struct AsyncRequest {
   }
 
   ~AsyncRequest() {
-    delete callback;
+    if(callback) {
+      delete callback;
+      callback = NULL;
+    }
 
-    if (desc)
+    if (desc) {
       delete desc;
+      desc = NULL;
+    }
 
-    if (postscriptName)
+    if (postscriptName) {
       delete postscriptName;
+      postscriptName = NULL;
+    }
 
-    if (substitutionString)
+    if (substitutionString) {
       delete substitutionString;
+      substitutionString = NULL;
+    }
 
     // result/results deleted by wrapResult/collectResults respectively
   }
@@ -94,7 +108,10 @@ void asyncCallback(uv_work_t *work) {
   }
 
   req->callback->Call(2, info, &async);
-  delete req;
+  if(req) {
+    delete req;
+    req = NULL;
+  }
 }
 
 void getAvailableFontsAsync(uv_work_t *work) {
@@ -153,7 +170,10 @@ NAN_METHOD(findFonts) {
     }
 
     Local<Object> res = collectResults(results);
-    delete descriptor;
+    if(descriptor) {
+      delete descriptor;
+      descriptor = NULL;
+    }
     info.GetReturnValue().Set(res);
   }
 }
@@ -188,7 +208,10 @@ NAN_METHOD(findFont) {
     }
 
     Local<Value> res = wrapResult(result);
-    delete descriptor;
+    if(descriptor) {
+      delete descriptor;
+      descriptor = NULL;
+    }
     info.GetReturnValue().Set(res);
   }
 }
