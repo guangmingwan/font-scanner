@@ -28,17 +28,19 @@ char *utf16ToUtf8(const WCHAR *input) {
 }
 
 // returns the index of the user's locale in the set of localized strings
-unsigned int getLocaleIndex(IDWriteLocalizedStrings *strings) {
+unsigned int getLocaleIndex(IDWriteLocalizedStrings *strings, bool useLocal) {
   unsigned int index = 0;
   BOOL exists = false;
-  wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
+  if(useLocal) {
+    wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
 
-  // Get the default locale for this user.
-  int success = GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH);
+    // Get the default locale for this user.
+    int success = GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH);
 
-  // If the default locale is returned, find that locale name, otherwise use "en-us".
-  if (success) {
-    HR(strings->FindLocaleName(localeName, &index, &exists));
+    // If the default locale is returned, find that locale name, otherwise use "en-us".
+    if (success) {
+      HR(strings->FindLocaleName(localeName, &index, &exists));
+    }
   }
 
   // if the above find did not find a match, retry with US English
@@ -53,7 +55,7 @@ unsigned int getLocaleIndex(IDWriteLocalizedStrings *strings) {
 }
 
 // gets a localized string for a font
-char *getString(IDWriteFont *font, DWRITE_INFORMATIONAL_STRING_ID string_id) {
+char *getString(IDWriteFont *font, DWRITE_INFORMATIONAL_STRING_ID string_id, bool useLocal) {
   char *res = NULL;
   IDWriteLocalizedStrings *strings = NULL;
 
@@ -65,7 +67,7 @@ char *getString(IDWriteFont *font, DWRITE_INFORMATIONAL_STRING_ID string_id) {
   ));
 
   if (exists) {
-    unsigned int index = getLocaleIndex(strings);
+    unsigned int index = getLocaleIndex(strings,useLocal);
     unsigned int len = 0;
     WCHAR *str = NULL;
 
@@ -122,9 +124,9 @@ long resultFromFont(FontDescriptor **res, IDWriteFont *font) {
       RETURN_ERROR_CODE(fileLoader->GetFilePathFromKey(referenceKey, referenceKeySize, name, nameLength + 1));
 
       char *psName = utf16ToUtf8(name);
-      char *postscriptName = getString(font, DWRITE_INFORMATIONAL_STRING_POSTSCRIPT_NAME);
-      char *family = getString(font, DWRITE_INFORMATIONAL_STRING_WIN32_FAMILY_NAMES);
-      char *style = getString(font, DWRITE_INFORMATIONAL_STRING_WIN32_SUBFAMILY_NAMES);
+      char *postscriptName = getString(font, DWRITE_INFORMATIONAL_STRING_POSTSCRIPT_NAME, true);
+      char *family = getString(font, DWRITE_INFORMATIONAL_STRING_WIN32_FAMILY_NAMES, false);
+      char *style = getString(font, DWRITE_INFORMATIONAL_STRING_WIN32_SUBFAMILY_NAMES, true);
 
       bool monospace = false;
       // this method requires windows 7, so we need to cast to an IDWriteFontFace1
