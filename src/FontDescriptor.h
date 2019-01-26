@@ -114,15 +114,15 @@ public:
   Local<Object> toJSObject() {
     Nan::EscapableHandleScope scope;
     Local<Object> res = Nan::New<Object>();
-    std::string spath = path;
-    std::string spostscriptName = postscriptName;
-    std::string sfamily = family;
-    std::string sstyle = style;
+    // std::string spath = path;
+    // std::string spostscriptName = postscriptName;
+    // std::string sfamily = family;
+    // std::string sstyle = style;
 
-    res->Set(Nan::New<String>("path").ToLocalChecked(), Nan::New<String>(spath.c_str()).ToLocalChecked());
-    res->Set(Nan::New<String>("postscriptName").ToLocalChecked(), Nan::New<String>(spostscriptName.c_str()).ToLocalChecked());
-    res->Set(Nan::New<String>("family").ToLocalChecked(), Nan::New<String>(sfamily.c_str()).ToLocalChecked());
-    res->Set(Nan::New<String>("style").ToLocalChecked(), Nan::New<String>(sstyle.c_str()).ToLocalChecked());
+    res->Set(Nan::New<String>("path").ToLocalChecked(), Nan::New<String>(path).ToLocalChecked());
+    res->Set(Nan::New<String>("postscriptName").ToLocalChecked(), Nan::New<String>(postscriptName).ToLocalChecked());
+    res->Set(Nan::New<String>("family").ToLocalChecked(), Nan::New<String>(family).ToLocalChecked());
+    res->Set(Nan::New<String>("style").ToLocalChecked(), Nan::New<String>(style).ToLocalChecked());
     res->Set(Nan::New<String>("weight").ToLocalChecked(), Nan::New<Number>(weight));
     res->Set(Nan::New<String>("width").ToLocalChecked(), Nan::New<Number>(width));
     res->Set(Nan::New<String>("italic").ToLocalChecked(), Nan::New<v8::Boolean>(italic));

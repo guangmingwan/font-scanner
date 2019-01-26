@@ -35,7 +35,7 @@ Local<Value> wrapResult(FontDescriptor *result) {
 
   Local<Object> res = result->toJSObject();
   SafeDelete(result);
-  return scope.Escape(res);
+  return res;
 }
 
 // holds data about an operation that will be
